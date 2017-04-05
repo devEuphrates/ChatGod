@@ -1,0 +1,8 @@
+C:\Users\game__000\Documents\Visual Studio 2015\Projects\ChatGod\ChatGod\obj\Debug\ChatGod.csprojResolveAssemblyReference.cache
+C:\Users\game__000\Documents\Visual Studio 2015\Projects\ChatGod\ChatGod\bin\Debug\ChatGod.dll
+C:\Users\game__000\Documents\Visual Studio 2015\Projects\ChatGod\ChatGod\bin\Debug\ChatGod.pdb
+C:\Users\game__000\Documents\Visual Studio 2015\Projects\ChatGod\ChatGod\obj\Debug\ChatGod.dll
+C:\Users\game__000\Documents\Visual Studio 2015\Projects\ChatGod\ChatGod\obj\Debug\ChatGod.pdb
+C:\Users\game__000\documents\visual studio 2015\Projects\ChatGod\ChatGod\bin\Debug\Rocket.API.dll
+C:\Users\game__000\documents\visual studio 2015\Projects\ChatGod\ChatGod\bin\Debug\Rocket.Core.dll
+C:\Users\game__000\documents\visual studio 2015\Projects\ChatGod\ChatGod\bin\Debug\Rocket.Unturned.dll
