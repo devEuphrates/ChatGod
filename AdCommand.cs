@@ -1,4 +1,5 @@
-﻿using Rocket.API;
+using fr34kyn01535.Uconomy;
+using Rocket.API;
 using Rocket.API.Collections;
 using Rocket.Core.Logging;
 using Rocket.Core.Plugins;
@@ -16,7 +17,7 @@ using UnityEngine;
 namespace Euphrates
 {
     class AdCommand : IRocketCommand
-     { 
+     {
         public AllowedCaller AllowedCaller
         {
             get { return AllowedCaller.Player; }
@@ -54,17 +55,36 @@ namespace Euphrates
             string mesage = ArgsToMessage(command);
             if (caller != null)
             {
-                UnturnedPlayer player = (UnturnedPlayer)caller;
-                if (player.Experience < balance)
+                if (ChatGod.Instance.Configuration.Instance.IsMysql == false)
                 {
-                    UnturnedChat.Say(player, error, Color.red);
+                    UnturnedPlayer player = (UnturnedPlayer)caller;
+                    if (player.Experience < balance)
+                    {
+                        UnturnedChat.Say(player, error, Color.red);
+                        return;
+                    }
+                    UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
+                    player.Experience -= (uint)balance;
+                    UnturnedChat.Say("[" + ChatGod.Instance.Translate("ad_by", player.DisplayName) + "]", AdColorCommand.Instance.selectedColor());
+                    UnturnedChat.Say(mesage, AdColorCommand.Instance.selectedColor());
                     return;
                 }
-                UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
-                player.Experience -= (uint)balance;
-                UnturnedChat.Say(ChatGod.Instance.Translate("ad_by") + player.DisplayName + " :");
-                UnturnedChat.Say(mesage);
-                return;
+                else
+                {
+                    int MySqlAdCost = ChatGod.Instance.Configuration.Instance.PlayerAdCost;
+                    UnturnedPlayer player = (UnturnedPlayer)caller;
+                    decimal MySqlBalance = Uconomy.Instance.Database.GetBalance(player.CSteamID.ToString());
+                    if (MySqlBalance < balance)
+                    {
+                        UnturnedChat.Say(player, error, Color.red);
+                        return;
+                    }
+                    UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
+                    Uconomy.Instance.Database.IncreaseBalance(player.CSteamID.ToString(), (MySqlAdCost * -1));
+                    UnturnedChat.Say("[" + ChatGod.Instance.Translate("ad_by", player.DisplayName) + "]", AdColorCommand.Instance.selectedColor());
+                    UnturnedChat.Say(mesage, AdColorCommand.Instance.selectedColor());
+                    return;
+                }
             }
             return;
         }
