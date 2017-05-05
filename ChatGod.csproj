@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -31,21 +31,28 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>lib\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\packages\Rocket.Unturned.4.9.8.2\lib\net35\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>lib\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\packages\Rocket.Unturned.4.9.8.2\lib\net35\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="I18N">
+      <HintPath>..\..\..\..\..\Desktop\Libraries\I18N.dll</HintPath>
+    </Reference>
+    <Reference Include="I18N.West">
+      <HintPath>..\..\..\..\..\Desktop\Libraries\I18N.West.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="Rocket.API">
-      <HintPath>lib\Rocket.API.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\Main\Server\UnturnedSV\Server\SV\Modules\Rocket.Unturned\Rocket.API.dll</HintPath>
     </Reference>
     <Reference Include="Rocket.Core">
-      <HintPath>lib\Rocket.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\Main\Server\UnturnedSV\Server\SV\Modules\Rocket.Unturned\Rocket.Core.dll</HintPath>
     </Reference>
     <Reference Include="Rocket.Unturned">
-      <HintPath>lib\Rocket.Unturned.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\Main\Server\UnturnedSV\Server\SV\Modules\Rocket.Unturned\Rocket.Unturned.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,12 +60,16 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Uconomy">
+      <HintPath>..\..\..\..\..\Desktop\Uconomy.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>lib\UnityEngine.dll</HintPath>
+      <HintPath>..\packages\Rocket.Core.2.4.2.0\lib\net35\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdColorCommand.cs" />
     <Compile Include="AdCommand.cs" />
     <Compile Include="ChatGod.cs" />
     <Compile Include="ChatGodConfig.cs" />
