@@ -1,4 +1,4 @@
-﻿using Rocket.API.Collections;
+using Rocket.API.Collections;
 using Rocket.Core.Logging;
 using Rocket.Core.Plugins;
 using Rocket.Unturned.Chat;
@@ -12,8 +12,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Steamworks;
 using UnityEngine;
+using MySql.Data.MySqlClient;
 using Logger = Rocket.Core.Logging.Logger;
 using Rocket.API;
+using fr34kyn01535.Uconomy;
 
 namespace Euphrates
 {
@@ -31,7 +33,9 @@ namespace Euphrates
                     {"areachat_not_allowed", "Area chat is not allowed in this server!"},
                     {"not_enough_xp", "You don't have enough XP to put an Advertisement!"},
                     {"ad_success", "Your advertisement is on!"},
-                    {"ad_by", "Advertisement by: "}
+                    {"ad_by", "Advertisement by {0}"},
+                    {"ad_colors", "List of colors:"},
+                    {"command_wrong_usage", "This is not how you use this command!"}
                 };
             }
         }
@@ -62,6 +66,22 @@ namespace Euphrates
                 Logger.LogError("Don't forget to check for updates!");
                 Logger.LogError("You can contact me through this Steam account: ");
                 Logger.LogError("http://steamcommunity.com/id/FrtYldrm");
+                if (Configuration.Instance.IsMysql == true)
+                {
+                    try
+                    {
+                        MySqlConnection cn = new MySqlConnection(string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};PORT={4};", new object[] {
+                    Uconomy.Instance.Configuration.Instance.DatabaseAddress,
+                    Uconomy.Instance.Configuration.Instance.DatabaseName,
+                    Uconomy.Instance.Configuration.Instance.DatabaseUsername,
+                    Uconomy.Instance.Configuration.Instance.DatabasePassword,
+                    Uconomy.Instance.Configuration.Instance.DatabasePort}));
+                    }
+                    catch (Exception exc)
+                    {
+                        Logger.LogException(exc, "Cannot connect to MySql Server");
+                    }
+                }
             }
             Instance = this;
         }
