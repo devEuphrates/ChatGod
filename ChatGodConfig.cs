@@ -1,4 +1,4 @@
-﻿using Rocket.API;
+using Rocket.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace Euphrates
 {
     public class ChatGodConfig : IRocketPluginConfiguration
     {
-            public bool PluginIsEnabled, DontAllowGlobalchat, DontAllowGroupchat, DontAllowAreachat;
+            public bool PluginIsEnabled, DontAllowGlobalchat, DontAllowGroupchat, DontAllowAreachat, IsMysql;
             public int PlayerAdCost;
         public void LoadDefaults()
         {
@@ -19,6 +19,7 @@ namespace Euphrates
             DontAllowGlobalchat = false;
             DontAllowGroupchat = false;
             DontAllowAreachat = false;
+            IsMysql = false;
             PlayerAdCost = 1000;
         }
     }
