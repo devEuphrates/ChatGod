@@ -1,4 +1,4 @@
-using fr34kyn01535.Uconomy;
+﻿using fr34kyn01535.Uconomy;
 using Rocket.API;
 using Rocket.API.Collections;
 using Rocket.Core.Logging;
@@ -65,8 +65,8 @@ namespace Euphrates
                     }
                     UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
                     player.Experience -= (uint)balance;
-                    UnturnedChat.Say("[" + ChatGod.Instance.Translate("ad_by", player.DisplayName) + "]", AdColorCommand.Instance.selectedColor());
-                    UnturnedChat.Say(mesage, AdColorCommand.Instance.selectedColor());
+                    UnturnedChat.Say("[" + ChatGod.Instance.Translate("ad_by", player.DisplayName) + "]", ChatGod.Instance.Configuration.Instance.adColor);
+                    UnturnedChat.Say(mesage, ChatGod.Instance.Configuration.Instance.adColor);
                     return;
                 }
                 else
@@ -81,8 +81,8 @@ namespace Euphrates
                     }
                     UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
                     Uconomy.Instance.Database.IncreaseBalance(player.CSteamID.ToString(), (MySqlAdCost * -1));
-                    UnturnedChat.Say("[" + ChatGod.Instance.Translate("ad_by", player.DisplayName) + "]", AdColorCommand.Instance.selectedColor());
-                    UnturnedChat.Say(mesage, AdColorCommand.Instance.selectedColor());
+                    UnturnedChat.Say("[" + ChatGod.Instance.Translate("ad_by", player.DisplayName) + "]", ChatGod.Instance.Configuration.Instance.adColor);
+                    UnturnedChat.Say(mesage, ChatGod.Instance.Configuration.Instance.adColor);
                     return;
                 }
             }

@@ -11,7 +11,6 @@ namespace Euphrates
 {
     class AdColorCommand : IRocketCommand
     {
-        Color ss = Color.blue;
         public static AdColorCommand Instance;
         public AllowedCaller AllowedCaller
         {
@@ -46,44 +45,45 @@ namespace Euphrates
         public void Execute(IRocketPlayer caller, string[] command)
         {
             UnturnedPlayer player = (UnturnedPlayer)caller;
-            if (command[0].ToLower() == "list")
+            if (command[0].ToLower() == "blue")
             {
-                UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_colors"), Color.cyan);
-                UnturnedChat.Say(player, "blue", Color.blue);
-                UnturnedChat.Say(player, "red", Color.red);
-                UnturnedChat.Say(player, "green", Color.green);
-                UnturnedChat.Say(player, "yellow", Color.yellow);
-                UnturnedChat.Say(player, "black", Color.black);
-            }
-            else if (command[0].ToLower() == "blue")
-            {
-                ss = Color.blue;
+                ChatGod.Instance.Configuration.Instance.adColor = Color.blue;
+                ChatGod.Instance.Configuration.Save();
             }
             else if (command[0].ToLower() == "red")
             {
-                ss = Color.red;
+                ChatGod.Instance.Configuration.Instance.adColor = Color.red;
+                ChatGod.Instance.Configuration.Save();
             }
             else if (command[0].ToLower() == "green")
             {
-                ss = Color.green;
+                ChatGod.Instance.Configuration.Instance.adColor = Color.green;
+                ChatGod.Instance.Configuration.Save();
             }
             else if (command[0].ToLower() == "yellow")
             {
-                ss = Color.yellow;
+                ChatGod.Instance.Configuration.Instance.adColor = Color.yellow;
+                ChatGod.Instance.Configuration.Save();
             }
             else if (command[0].ToLower() == "black")
             {
-                ss = Color.black;
+                ChatGod.Instance.Configuration.Instance.adColor = Color.black;
+                ChatGod.Instance.Configuration.Save();
+            }
+            else if (command[0].ToLower() == "cyan")
+            {
+                ChatGod.Instance.Configuration.Instance.adColor = Color.cyan;
+                ChatGod.Instance.Configuration.Save();
+            }
+            else if (command[0].ToLower() == "magenta")
+            {
+                ChatGod.Instance.Configuration.Instance.adColor = Color.magenta;
+                ChatGod.Instance.Configuration.Save();
             }
             else
             {
                 UnturnedChat.Say(player, ChatGod.Instance.Translate("command_wrong_usage"), Color.red);
             }
-        }
-
-        public Color selectedColor()
-        {
-            return ss;
         }
     }
 }

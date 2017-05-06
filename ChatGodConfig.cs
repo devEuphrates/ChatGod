@@ -1,4 +1,4 @@
-using Rocket.API;
+﻿using Rocket.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +13,10 @@ namespace Euphrates
     {
             public bool PluginIsEnabled, DontAllowGlobalchat, DontAllowGroupchat, DontAllowAreachat, IsMysql;
             public int PlayerAdCost;
+        public Color adColor;
         public void LoadDefaults()
         {
+            adColor = Color.blue;
             PluginIsEnabled = true;
             DontAllowGlobalchat = false;
             DontAllowGroupchat = false;

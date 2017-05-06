@@ -1,4 +1,4 @@
-using Rocket.API.Collections;
+﻿using Rocket.API.Collections;
 using Rocket.Core.Logging;
 using Rocket.Core.Plugins;
 using Rocket.Unturned.Chat;
@@ -34,7 +34,6 @@ namespace Euphrates
                     {"not_enough_xp", "You don't have enough XP to put an Advertisement!"},
                     {"ad_success", "Your advertisement is on!"},
                     {"ad_by", "Advertisement by {0}"},
-                    {"ad_colors", "List of colors:"},
                     {"command_wrong_usage", "This is not how you use this command!"}
                 };
             }
