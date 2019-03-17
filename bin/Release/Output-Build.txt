@@ -1,3 +1,0 @@
-﻿1>------ Build started: Project: ChatGod, Configuration: Debug Any CPU ------
-1>  ChatGod -> C:\Users\game__000\Documents\Visual Studio 2015\Projects\ChatGod\ChatGod\bin\Debug\ChatGod.dll
-========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
