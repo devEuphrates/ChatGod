@@ -1,5 +1,5 @@
-﻿using fr34kyn01535.Uconomy;
-using MySql.Data.MySqlClient;
+﻿//using fr34kyn01535.Uconomy;
+//using MySql.Data.MySqlClient;
 using Rocket.API;
 using Rocket.API.Collections;
 using Rocket.Core.Plugins;
@@ -16,6 +16,7 @@ namespace Euphrates
 {
     public class ChatGod : RocketPlugin<ChatGodConfig>
     {
+        public string chatLogPath = System.IO.Directory.GetCurrentDirectory() + @"\Plugins\ChatGod\ChatLog.txt";
         public static ChatGod Instance;
         public override TranslationList DefaultTranslations
         {
@@ -29,9 +30,8 @@ namespace Euphrates
                     {"allowed_colors_header", "Allowed colors in this server:"},
                     {"color_not_allowed", "The color you requested is not allowed by this server!"},
                     {"not_enough_xp", "You don't have enough XP to put an Advertisement!"},
-                    {"not_enough_money", "You don't have enough money."},
+                    //{"not_enough_money", "You don't have enough money."},
                     {"ad_success", "Your advertisement is on!"},
-                    {"ad_by", "Advertisement by {0}"},
                     {"command_wrong_usage", "This is not how you use this command!"}
                 };
             }
@@ -42,9 +42,18 @@ namespace Euphrates
             base.Load();
             UnturnedPlayerEvents.OnPlayerChatted += UnturnedPlayerEvents_OnPlayerChatted;
             bool playerConfigIsEnabled = Configuration.Instance.PluginIsEnabled;
-            string PluginLoaded = "ChatGod Plugin By Euphrates";
-            Logger.LogError("[ChatGod] Plugins is loaded now you have the full control over chat!");
-            UnturnedChat.Say(PluginLoaded, Color.cyan);
+            Logger.LogWarning("[ChatGod] Plugin loaded checking configuration file...");
+            Logger.LogWarning("[ChatGod] Checking chat log file...");
+
+            if (!File.Exists(chatLogPath))
+            {
+                Logger.LogWarning("[ChatGod] Chat log file doesn't exist creating one...");
+                using (File.Create(chatLogPath)) { } ;
+                Logger.LogWarning("[ChatGod] Chat log file created!");
+            }
+            else
+                Logger.LogWarning("[ChatGod] Chat log file exists!");
+
             if (playerConfigIsEnabled == false)
             {
                 Logger.LogError("[ChatGod] Plugin is been DISABLED from configuration");
@@ -56,29 +65,35 @@ namespace Euphrates
             }
             else if(playerConfigIsEnabled == true)
             {
-                Logger.LogError("[ChatGod] Plugin is been ENABLED from configuration");
+                Logger.LogWarning("[ChatGod] Plugin is ENABLED from configuration");
+                Logger.LogWarning("[ChatGod] Now you have full control over chat!");
+                Logger.LogWarning("[ChatGod]  _____________________________________________________");
+                Logger.LogWarning("[ChatGod] |                                                     |");
+                Logger.LogWarning("[ChatGod] |                 Plugin By Euphrates                 |");
+                Logger.LogWarning("[ChatGod] |         Don't forget to check for updates!          |");
+                Logger.LogWarning("[ChatGod] |    You can contact me through this Steam account:   |");
+                Logger.LogWarning("[ChatGod] |        http://steamcommunity.com/id/FrtYldrm        |");
+                Logger.LogWarning("[ChatGod] |_____________________________________________________|");
+
                 UnturnedChat.Say("[ChatGod] Plugin is been ENABLED from configuration", Color.cyan);
-                Logger.LogError("[ChatGod] Plugin By Euphrates");
                 UnturnedChat.Say("[ChatGod] Plugin By Euphrates", Color.cyan);
-                Logger.LogError("[ChatGod] Don't forget to check for updates!");
-                Logger.LogError("[ChatGod] You can contact me through this Steam account: ");
-                Logger.LogError("[ChatGod] http://steamcommunity.com/id/FrtYldrm");
-                if (Configuration.Instance.UsingUconomy == true)
-                {
-                    try
-                    {
-                    MySqlConnection cn = new MySqlConnection(string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};PORT={4};", new object[] {
-                    Uconomy.Instance.Configuration.Instance.DatabaseAddress,
-                    Uconomy.Instance.Configuration.Instance.DatabaseName,
-                    Uconomy.Instance.Configuration.Instance.DatabaseUsername,
-                    Uconomy.Instance.Configuration.Instance.DatabasePassword,
-                    Uconomy.Instance.Configuration.Instance.DatabasePort}));
-                    }
-                    catch (Exception exc)
-                    {
-                        Logger.LogException(exc, "[ChatGod] Cannot connect to MySql Server");
-                    }
-                }
+
+                //if (Configuration.Instance.UsingUconomy == true)
+                //{
+                //    try
+                //    {
+                //    MySqlConnection cn = new MySqlConnection(string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};PORT={4};", new object[] {
+                //    Uconomy.Instance.Configuration.Instance.DatabaseAddress,
+                //    Uconomy.Instance.Configuration.Instance.DatabaseName,
+                //    Uconomy.Instance.Configuration.Instance.DatabaseUsername,
+                //    Uconomy.Instance.Configuration.Instance.DatabasePassword,
+                //    Uconomy.Instance.Configuration.Instance.DatabasePort}));
+                //    }
+                //    catch (Exception exc)
+                //    {
+                //        Logger.LogException(exc, "[ChatGod] Cannot connect to MySql Server");
+                //    }
+                //}
             }
             Instance = this;
         }
@@ -132,7 +147,6 @@ namespace Euphrates
 
             if (Configuration.Instance.LogAllChat)
             {
-                string chatLogPath = System.IO.Directory.GetCurrentDirectory() + @"\Plugins\UnturnedRoleplayEssentials\ChatLog.txt";
                 string appendText = "";
 
                 if (cancel)
