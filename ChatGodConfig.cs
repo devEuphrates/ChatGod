@@ -1,27 +1,23 @@
 ﻿using Rocket.API;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Rocket.API.Collections;
-using Rocket.Core.Assets;
-using UnityEngine;
 
 namespace Euphrates
 {
     public class ChatGodConfig : IRocketPluginConfiguration
     {
-            public bool PluginIsEnabled, DontAllowGlobalchat, DontAllowGroupchat, DontAllowAreachat, IsMysql;
-            public int PlayerAdCost;
-        public Color adColor;
+        public bool PluginIsEnabled, DontAllowGlobalchat, DontAllowGroupchat, DontAllowAreachat, UsingUconomy, LogAllChat, LogChatDate;
+        public int PlayerAdCost;
+        public List<string> AllowedAdColors;
         public void LoadDefaults()
         {
-            adColor = Color.blue;
+            AllowedAdColors.Add("blue");
+            AllowedAdColors.Add("green");
             PluginIsEnabled = true;
-            DontAllowGlobalchat = false;
+            DontAllowGlobalchat = true;
             DontAllowGroupchat = false;
             DontAllowAreachat = false;
-            IsMysql = false;
+            UsingUconomy = false;
+            LogAllChat = false;
             PlayerAdCost = 1000;
         }
     }

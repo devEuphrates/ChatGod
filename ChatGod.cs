@@ -1,21 +1,16 @@
-﻿using Rocket.API.Collections;
-using Rocket.Core.Logging;
+﻿using fr34kyn01535.Uconomy;
+using MySql.Data.MySqlClient;
+using Rocket.API;
+using Rocket.API.Collections;
 using Rocket.Core.Plugins;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using Steamworks;
+using System.IO;
 using UnityEngine;
-using MySql.Data.MySqlClient;
 using Logger = Rocket.Core.Logging.Logger;
-using Rocket.API;
-using fr34kyn01535.Uconomy;
 
 namespace Euphrates
 {
@@ -31,7 +26,10 @@ namespace Euphrates
                     {"globalchat_not_allowed", "Global chat is not allowed in this server!"},
                     {"groupchat_not_allowed", "Group chat is not allowed in this server!"},
                     {"areachat_not_allowed", "Area chat is not allowed in this server!"},
+                    {"allowed_colors_header", "Allowed colors in this server:"},
+                    {"color_not_allowed", "The color you requested is not allowed by this server!"},
                     {"not_enough_xp", "You don't have enough XP to put an Advertisement!"},
+                    {"not_enough_money", "You don't have enough money."},
                     {"ad_success", "Your advertisement is on!"},
                     {"ad_by", "Advertisement by {0}"},
                     {"command_wrong_usage", "This is not how you use this command!"}
@@ -45,31 +43,31 @@ namespace Euphrates
             UnturnedPlayerEvents.OnPlayerChatted += UnturnedPlayerEvents_OnPlayerChatted;
             bool playerConfigIsEnabled = Configuration.Instance.PluginIsEnabled;
             string PluginLoaded = "ChatGod Plugin By Euphrates";
-            Logger.LogError("Plugins is loaded now you have the full control over global chat");
+            Logger.LogError("[ChatGod] Plugins is loaded now you have the full control over chat!");
             UnturnedChat.Say(PluginLoaded, Color.cyan);
             if (playerConfigIsEnabled == false)
             {
-                Logger.LogError("Plugin is been DISABLED from configuration");
-                Logger.LogError("Unloading Plugin!");
-                UnturnedChat.Say("Plugin is been DISABLED from configuration", Color.red);
-                UnturnedChat.Say("Unloading Plugin", Color.red);
+                Logger.LogError("[ChatGod] Plugin is been DISABLED from configuration");
+                Logger.LogError("[ChatGod] Unloading Plugin!");
+                UnturnedChat.Say("[ChatGod] Plugin is been DISABLED from configuration", Color.red);
+                UnturnedChat.Say("[ChatGod] Unloading Plugin", Color.red);
                 base.Unload();
                 return;
             }
             else if(playerConfigIsEnabled == true)
             {
-                Logger.LogError("Plugin is been ENABLED from configuration");
-                UnturnedChat.Say("Plugin is been ENABLED from configuration", Color.cyan);
-                Logger.LogError("Plugin By Euphrates");
-                UnturnedChat.Say("Plugin By Euphrates", Color.cyan);
-                Logger.LogError("Don't forget to check for updates!");
-                Logger.LogError("You can contact me through this Steam account: ");
-                Logger.LogError("http://steamcommunity.com/id/FrtYldrm");
-                if (Configuration.Instance.IsMysql == true)
+                Logger.LogError("[ChatGod] Plugin is been ENABLED from configuration");
+                UnturnedChat.Say("[ChatGod] Plugin is been ENABLED from configuration", Color.cyan);
+                Logger.LogError("[ChatGod] Plugin By Euphrates");
+                UnturnedChat.Say("[ChatGod] Plugin By Euphrates", Color.cyan);
+                Logger.LogError("[ChatGod] Don't forget to check for updates!");
+                Logger.LogError("[ChatGod] You can contact me through this Steam account: ");
+                Logger.LogError("[ChatGod] http://steamcommunity.com/id/FrtYldrm");
+                if (Configuration.Instance.UsingUconomy == true)
                 {
                     try
                     {
-                        MySqlConnection cn = new MySqlConnection(string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};PORT={4};", new object[] {
+                    MySqlConnection cn = new MySqlConnection(string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};PORT={4};", new object[] {
                     Uconomy.Instance.Configuration.Instance.DatabaseAddress,
                     Uconomy.Instance.Configuration.Instance.DatabaseName,
                     Uconomy.Instance.Configuration.Instance.DatabaseUsername,
@@ -78,7 +76,7 @@ namespace Euphrates
                     }
                     catch (Exception exc)
                     {
-                        Logger.LogException(exc, "Cannot connect to MySql Server");
+                        Logger.LogException(exc, "[ChatGod] Cannot connect to MySql Server");
                     }
                 }
             }
@@ -89,6 +87,7 @@ namespace Euphrates
             bool PlayerConfigGlobalDisabled = Configuration.Instance.DontAllowGlobalchat;
             bool PlayerConfigGroupDisabled = Configuration.Instance.DontAllowGroupchat;
             bool PlayerConfigAreaDisabled = Configuration.Instance.DontAllowAreachat;
+
             if (PlayerConfigGlobalDisabled == true)
             {
                 if (PlayerConfigGlobalDisabled == true)
@@ -100,12 +99,11 @@ namespace Euphrates
                             string globalNotAllowed = Translate("globalchat_not_allowed");
                             cancel = true;
                             UnturnedChat.Say(player, globalNotAllowed, Color.red);
-                            return;
                         }
-                        return;
                     }
                 }
             }
+
             if (PlayerConfigGroupDisabled == true)
             {
                 if (Chatmode == EChatMode.GROUP)
@@ -115,11 +113,10 @@ namespace Euphrates
                         string groupNotAllowed = Translate("groupchat_not_allowed");
                         cancel = true;
                         UnturnedChat.Say(player, groupNotAllowed, Color.red);
-                        return;
                     }
-                   return;
                 }
             }
+
             if(PlayerConfigAreaDisabled == true)
             {
                 if(Chatmode == EChatMode.LOCAL)
@@ -129,11 +126,25 @@ namespace Euphrates
                         string areaNotAllowed = Translate("areachat_not_allowed");
                         cancel = true;
                         UnturnedChat.Say(player, areaNotAllowed, Color.red);
-                        return;
                     }
-                    return;
                 }
             }
-          }
+
+            if (Configuration.Instance.LogAllChat)
+            {
+                string chatLogPath = System.IO.Directory.GetCurrentDirectory() + @"\Plugins\UnturnedRoleplayEssentials\ChatLog.txt";
+                string appendText = "";
+
+                if (cancel)
+                    appendText += "CANCELED -- ";
+
+                if (Configuration.Instance.LogChatDate)
+                    appendText += "(" + DateTime.Now.ToString() + ") ";
+
+                appendText += Chatmode.ToString();
+
+                File.AppendAllText(chatLogPath, appendText + message + System.Environment.NewLine);
+            }
+        }
         }
     }
