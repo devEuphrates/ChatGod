@@ -71,6 +71,7 @@ namespace Euphrates
                 if (!ChatGod.Instance.Configuration.Instance.AllowedAdColors.Contains(command[0].ToString().ToLower()))
                 {
                     UnturnedChat.Say(player, ChatGod.Instance.Translate("color_not_allowed"), Color.red);
+                    return;
                 }
 
                 UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
@@ -92,6 +93,7 @@ namespace Euphrates
                 //    if (!ChatGod.Instance.Configuration.Instance.AllowedAdColors.Contains(command[0].ToString().ToLower()))
                 //    {
                 //        UnturnedChat.Say(player, ChatGod.Instance.Translate("color_not_allowed"), Color.red);
+                //        return;
                 //    }
 
                 //    UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
