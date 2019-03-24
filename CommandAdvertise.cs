@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Euphrates
 {
-    class AdCommand : IRocketCommand
+    class CommandAdvertise : IRocketCommand
     {
         public AllowedCaller AllowedCaller
         {
@@ -32,7 +32,7 @@ namespace Euphrates
             {
                 return new List<string>
                 {
-                    "advert"
+                    "ChatGod.Advert"
                 };
             }
         }
@@ -40,9 +40,16 @@ namespace Euphrates
         {
             get { return new List<string> { "ad", "newad", "advertise" }; }
         }
+
         public void Execute(IRocketPlayer caller, string[] command)
         {
             UnturnedPlayer player = (UnturnedPlayer)caller;
+
+            if (!ChatGod.Instance.Configuration.Instance.AllowAdvertisements)
+            {
+                UnturnedChat.Say(player, ChatGod.Instance.Translate("advertisements_not_allowed"), Color.red);
+                return;
+            }
 
             if (command[0].ToString().ToLower() == "colors")
             {
@@ -53,67 +60,50 @@ namespace Euphrates
                 }
                 return;
             }
-
             int balance = ChatGod.Instance.Configuration.Instance.PlayerAdCost;
-            string message = ArgsToMessage(command.Where(var => var != command[0].ToString().ToLower()).ToArray());
+            string message = ChatGod.Instance.ArgsToMessage(command.Where(var => var != command[0].ToString().ToLower()).ToArray());
+            //if (ChatGod.Instance.Configuration.Instance.UsingUconomy == false)
+            //{
 
-            if (caller != null)
+            if (player.Experience < balance)
             {
-                //if (ChatGod.Instance.Configuration.Instance.UsingUconomy == false)
-                //{
-
-                if (player.Experience < balance)
-                {
-                    UnturnedChat.Say(player, ChatGod.Instance.Translate("not_enough_xp"), Color.red);
-                    return;
-                }
-
-                if (!ChatGod.Instance.Configuration.Instance.AllowedAdColors.Contains(command[0].ToString().ToLower()))
-                {
-                    UnturnedChat.Say(player, ChatGod.Instance.Translate("color_not_allowed"), Color.red);
-                    return;
-                }
-
-                UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
-                player.Experience -= (uint)balance;
-                UnturnedChat.Say(message, UnturnedChat.GetColorFromName(command[0].ToString().ToLower(), Color.gray));
+                UnturnedChat.Say(player, ChatGod.Instance.Translate("not_enough_xp"), Color.red);
                 return;
-
-                //else
-                //{
-                //    int MySqlAdCost = ChatGod.Instance.Configuration.Instance.PlayerAdCost;
-                //    decimal MySqlBalance = Uconomy.Instance.Database.GetBalance(player.CSteamID.ToString());
-
-                //    if (MySqlBalance < balance)
-                //    {
-                //        UnturnedChat.Say(player, ChatGod.Instance.Translate("not_enough_xp"), Color.red);
-                //        return;
-                //    }
-
-                //    if (!ChatGod.Instance.Configuration.Instance.AllowedAdColors.Contains(command[0].ToString().ToLower()))
-                //    {
-                //        UnturnedChat.Say(player, ChatGod.Instance.Translate("color_not_allowed"), Color.red);
-                //        return;
-                //    }
-
-                //    UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
-                //    Uconomy.Instance.Database.IncreaseBalance(player.CSteamID.ToString(), (MySqlAdCost * -1));
-                //    UnturnedChat.Say(message, UnturnedChat.GetColorFromName(command[0].ToString().ToLower(), Color.gray));
-                //    return;
-                //}
             }
-            return;
-        }
 
-        public string ArgsToMessage(string[] args)
-        {
-            string tmp = "";
-            foreach (string arg in args)
-                if (tmp == "")
-                    tmp = arg;
-                else
-                    tmp += " " + arg;
-            return tmp;
+            if (!ChatGod.Instance.Configuration.Instance.AllowedAdColors.Contains(command[0].ToString().ToLower()))
+            {
+                UnturnedChat.Say(player, ChatGod.Instance.Translate("color_not_allowed"), Color.red);
+                return;
+            }
+
+            UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
+            player.Experience -= (uint)balance;
+            UnturnedChat.Say(message, UnturnedChat.GetColorFromName(command[0].ToString().ToLower(), Color.gray));
+            return;
+
+            //else
+            //{
+            //    int MySqlAdCost = ChatGod.Instance.Configuration.Instance.PlayerAdCost;
+            //    decimal MySqlBalance = Uconomy.Instance.Database.GetBalance(player.CSteamID.ToString());
+
+            //    if (MySqlBalance < balance)
+            //    {
+            //        UnturnedChat.Say(player, ChatGod.Instance.Translate("not_enough_xp"), Color.red);
+            //        return;
+            //    }
+
+            //    if (!ChatGod.Instance.Configuration.Instance.AllowedAdColors.Contains(command[0].ToString().ToLower()))
+            //    {
+            //        UnturnedChat.Say(player, ChatGod.Instance.Translate("color_not_allowed"), Color.red);
+            //        return;
+            //    }
+
+            //    UnturnedChat.Say(player, ChatGod.Instance.Translate("ad_success"), Color.blue);
+            //    Uconomy.Instance.Database.IncreaseBalance(player.CSteamID.ToString(), (MySqlAdCost * -1));
+            //    UnturnedChat.Say(message, UnturnedChat.GetColorFromName(command[0].ToString().ToLower(), Color.gray));
+            //    return;
+            //}
         }
 
     }

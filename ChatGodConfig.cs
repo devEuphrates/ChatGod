@@ -5,20 +5,22 @@ namespace Euphrates
 {
     public class ChatGodConfig : IRocketPluginConfiguration
     {
-        public bool PluginIsEnabled, DontAllowGlobalchat, DontAllowGroupchat, DontAllowAreachat, LogAllChat, LogChatDate;
+        public bool PluginIsEnabled, AllowAdvertisements, BanGlobalchat, BanGroupchat, BanAreachat, LogAllChat, LogChatDate, ChatFilter;
         public int PlayerAdCost;
         public List<string> AllowedAdColors = new List<string>();
         public void LoadDefaults()
         {
+            PluginIsEnabled = true;
             AllowedAdColors.Add("blue");
             AllowedAdColors.Add("green");
-            PluginIsEnabled = true;
-            DontAllowGlobalchat = true;
-            DontAllowGroupchat = false;
-            DontAllowAreachat = false;
+            AllowAdvertisements = false;
+            BanGlobalchat = false;
+            BanGroupchat = false;
+            BanAreachat = false;
             //UsingUconomy = false;
             LogAllChat = false;
             PlayerAdCost = 1000;
+            ChatFilter = false;
         }
     }
 }

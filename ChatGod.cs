@@ -17,6 +17,10 @@ namespace Euphrates
     public class ChatGod : RocketPlugin<ChatGodConfig>
     {
         public string chatLogPath = System.IO.Directory.GetCurrentDirectory() + @"\Plugins\ChatGod\ChatLog.txt";
+        public string bannedWordsPath = System.IO.Directory.GetCurrentDirectory() + @"\Plugins\ChatGod\BannedWords.txt";
+        public string mutedPlayersListPath = System.IO.Directory.GetCurrentDirectory() + @"\Plugins\ChatGod\MutedPlayersList.txt";
+        public string[] bannedWords;
+        public string[] mutedPlayers;
         public static ChatGod Instance;
         public override TranslationList DefaultTranslations
         {
@@ -27,12 +31,19 @@ namespace Euphrates
                     {"globalchat_not_allowed", "Global chat is not allowed in this server!"},
                     {"groupchat_not_allowed", "Group chat is not allowed in this server!"},
                     {"areachat_not_allowed", "Area chat is not allowed in this server!"},
+                    {"advertisements_not_allowed", "You can't put advertisements on this server!"},
                     {"allowed_colors_header", "Allowed colors in this server:"},
                     {"color_not_allowed", "The color you requested is not allowed by this server!"},
                     {"not_enough_xp", "You don't have enough XP to put an Advertisement!"},
                     //{"not_enough_money", "You don't have enough money."},
                     {"ad_success", "Your advertisement is on!"},
-                    {"command_wrong_usage", "This is not how you use this command!"}
+                    {"player_dont_exist", "No such player was found!"},
+                    {"player_muted", "Successfully muted {0}!"},
+                    {"player_already_muted", "{0} is already muted!"},
+                    {"player_unmuted", "Successfully unmuted {0}!"},
+                    {"player_unmute_fail", "Cannot unmute {0}!"},
+                    {"on_muted_chat", "You are muted, you are not allowed to chat!"},
+                    {"on_use_banned_word", "You can't use these words!"}
                 };
             }
         }
@@ -47,12 +58,31 @@ namespace Euphrates
 
             if (!File.Exists(chatLogPath))
             {
-                Logger.LogWarning("[ChatGod] Chat log file doesn't exist creating one...");
-                using (File.Create(chatLogPath)) { } ;
+                Logger.LogWarning("[ChatGod] Chat log file doesn't exist, creating one...");
+                using (File.Create(chatLogPath)) { };
                 Logger.LogWarning("[ChatGod] Chat log file created!");
             }
             else
                 Logger.LogWarning("[ChatGod] Chat log file exists!");
+
+            if (!File.Exists(bannedWordsPath))
+            {
+                Logger.LogWarning("[ChatGod] Banned words file doesn't exist, creating one...");
+                using (File.Create(bannedWordsPath)) { };
+                Logger.LogWarning("[ChatGod] Banned words file created!");
+            }
+            else
+                Logger.LogWarning("[ChatGod] Banned words file exists!");
+
+            if (!File.Exists(mutedPlayersListPath))
+            {
+                Logger.LogWarning("[ChatGod] Muted players file doesn't exist, creating one...");
+                using (File.Create(mutedPlayersListPath)) { };
+                Logger.LogWarning("[ChatGod] Muted players file created!");
+            }
+            else
+                Logger.LogWarning("[ChatGod] Muted players file exists!");
+            mutedPlayers = File.ReadAllLines(mutedPlayersListPath);
 
             if (playerConfigIsEnabled == false)
             {
@@ -63,7 +93,7 @@ namespace Euphrates
                 base.Unload();
                 return;
             }
-            else if(playerConfigIsEnabled == true)
+            else if (playerConfigIsEnabled == true)
             {
                 Logger.LogWarning("[ChatGod] Plugin is ENABLED from configuration");
                 Logger.LogWarning("[ChatGod] Now you have full control over chat!");
@@ -74,6 +104,33 @@ namespace Euphrates
                 Logger.LogWarning("[ChatGod] |    You can contact me through this Steam account:   |");
                 Logger.LogWarning("[ChatGod] |        http://steamcommunity.com/id/FrtYldrm        |");
                 Logger.LogWarning("[ChatGod] |_____________________________________________________|");
+                Logger.LogWarning("[ChatGod]");
+                Logger.LogWarning("[ChatGod]  ____________________Plugin Status____________________");
+                Logger.LogWarning("[ChatGod] - Global Chat: " + !Configuration.Instance.BanGlobalchat);
+                Logger.LogWarning("[ChatGod] - Area Chat: " + !Configuration.Instance.BanAreachat);
+                Logger.LogWarning("[ChatGod] - Group Chat: " + !Configuration.Instance.BanGroupchat);
+                Logger.LogWarning("[ChatGod] ");
+                Logger.LogWarning("[ChatGod] - Chat Filter: " + Configuration.Instance.ChatFilter);
+                if (Configuration.Instance.ChatFilter)
+                {
+                    bannedWords = File.ReadAllLines(bannedWordsPath);
+                    Logger.LogWarning("[ChatGod] - Banned " + bannedWords.Length + " words from chat!");
+                }
+                Logger.LogWarning("[ChatGod] ");
+                Logger.LogWarning("[ChatGod] - Log all chat activity: " + Configuration.Instance.LogAllChat);
+                if (Configuration.Instance.LogAllChat)
+                    Logger.LogWarning("[ChatGod] - Log chat dates: " + Configuration.Instance.LogChatDate);
+                Logger.LogWarning("[ChatGod] ");
+                Logger.LogWarning("[ChatGod] - Advertisements: " + Configuration.Instance.AllowAdvertisements);
+                if (Configuration.Instance.AllowAdvertisements)
+                {
+                    Logger.LogWarning("[ChatGod] - Advertisement xp cost: " + Configuration.Instance.PlayerAdCost);
+                    Logger.LogWarning("[ChatGod] - Allowed AD colors: ");
+                    foreach (string c in Configuration.Instance.AllowedAdColors)
+                    {
+                        Logger.LogWarning("[ChatGod] * " + c);
+                    }
+                }
 
                 UnturnedChat.Say("[ChatGod] Plugin is been ENABLED from configuration", Color.cyan);
                 UnturnedChat.Say("[ChatGod] Plugin By Euphrates", Color.cyan);
@@ -99,31 +156,41 @@ namespace Euphrates
         }
         private void UnturnedPlayerEvents_OnPlayerChatted(UnturnedPlayer player, ref Color color, string message, EChatMode Chatmode, ref bool cancel)
         {
-            bool PlayerConfigGlobalDisabled = Configuration.Instance.DontAllowGlobalchat;
-            bool PlayerConfigGroupDisabled = Configuration.Instance.DontAllowGroupchat;
-            bool PlayerConfigAreaDisabled = Configuration.Instance.DontAllowAreachat;
+            bool censored = false;
+            bool muted = false;
 
-            if (PlayerConfigGlobalDisabled == true)
+            if (!player.HasPermission("mute.protect"))
             {
-                if (PlayerConfigGlobalDisabled == true)
+                for (int i = 0; i < mutedPlayers.Length; i++)
                 {
-                    if (Chatmode == EChatMode.GLOBAL)
+                    if (mutedPlayers[i] == player.CSteamID.ToString())
                     {
-                        if (!player.HasPermission("allowglobal"))
-                        {
-                            string globalNotAllowed = Translate("globalchat_not_allowed");
-                            cancel = true;
-                            UnturnedChat.Say(player, globalNotAllowed, Color.red);
-                        }
+                        UnturnedChat.Say(player, Translate("on_muted_chat"), Color.red);
+                        cancel = true;
+                        muted = true;
+                        break;
                     }
                 }
             }
 
-            if (PlayerConfigGroupDisabled == true)
+            if (Configuration.Instance.BanGlobalchat == true)
+            {
+                if (Chatmode == EChatMode.GLOBAL)
+                {
+                    if (!player.HasPermission("allow.global"))
+                    {
+                        string globalNotAllowed = Translate("globalchat_not_allowed");
+                        cancel = true;
+                        UnturnedChat.Say(player, globalNotAllowed, Color.red);
+                    }
+                }
+            }
+
+            if (Configuration.Instance.BanGroupchat == true)
             {
                 if (Chatmode == EChatMode.GROUP)
                 {
-                    if (!player.HasPermission("allowgroup"))
+                    if (!player.HasPermission("allow.group"))
                     {
                         string groupNotAllowed = Translate("groupchat_not_allowed");
                         cancel = true;
@@ -132,11 +199,11 @@ namespace Euphrates
                 }
             }
 
-            if(PlayerConfigAreaDisabled == true)
+            if (Configuration.Instance.BanAreachat == true)
             {
-                if(Chatmode == EChatMode.LOCAL)
+                if (Chatmode == EChatMode.LOCAL)
                 {
-                    if (!player.HasPermission("allowarea"))
+                    if (!player.HasPermission("allow.area"))
                     {
                         string areaNotAllowed = Translate("areachat_not_allowed");
                         cancel = true;
@@ -145,20 +212,57 @@ namespace Euphrates
                 }
             }
 
+            if (Configuration.Instance.ChatFilter && !cancel && !muted && !player.HasPermission("ignore.badwords"))
+            {
+                string badWords = "";
+
+                for (int i = 0; i < bannedWords.Length; i++)
+                {
+                    if (message.ToLower().Contains(bannedWords[i].ToLower()))
+                    {
+                        badWords += bannedWords[i] + " ";
+                        cancel = true;
+                        censored = true;
+                    }
+                }
+
+                if (censored)
+                    UnturnedChat.Say(player, Translate("on_use_banned_word") + " [" + badWords + "]", Color.red);
+            }
+
             if (Configuration.Instance.LogAllChat)
             {
                 string appendText = "";
 
-                if (cancel)
+                if (cancel && !censored && !muted)
                     appendText += "CANCELED -- ";
+
+                if (censored)
+                    appendText += "CENSORED -- ";
+
+                if (muted)
+                    appendText += "MUTED -- ";
 
                 if (Configuration.Instance.LogChatDate)
                     appendText += "(" + DateTime.Now.ToString() + ") ";
 
-                appendText += Chatmode.ToString();
+                appendText += "[" + Chatmode.ToString() + "] ";
+                appendText += player.CharacterName + ": ";
 
                 File.AppendAllText(chatLogPath, appendText + message + System.Environment.NewLine);
             }
         }
+
+        public string ArgsToMessage(string[] args)
+        {
+            string tmp = "";
+            foreach (string arg in args)
+                if (tmp == "")
+                    tmp = arg;
+                else
+                    tmp += " " + arg;
+            return tmp;
         }
+
     }
+}
